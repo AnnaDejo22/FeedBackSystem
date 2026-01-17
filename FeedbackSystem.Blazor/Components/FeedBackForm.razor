@@ -52,7 +52,6 @@
             {
                 message = "Feedback submitted successfully!";
 
-                // Reset form
                 feedback = new FeedbackDTO
                 {
                     UserName = string.Empty,
@@ -68,7 +67,6 @@
         }
         catch (Exception ex)
         {
-            // Likely network/CORS error
             message = $"Error submitting feedback: {ex.Message}";
         }
     }

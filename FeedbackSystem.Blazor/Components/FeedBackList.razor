@@ -21,6 +21,7 @@
                     <th>Feedback</th>
                     <th>Rating</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,6 +32,9 @@
                         <td>@fb.FeedbackText</td>
                         <td>@fb.Rating</td>
                         <td>@fb.Status</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" @onclick="() => ShowModal(fb)">View</button>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -38,9 +42,39 @@
     }
 </div>
 
+
+@if (selectedFeedback != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Feedback Details</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>User Name:</strong> @selectedFeedback.UserName</p>
+                    <p><strong>Feedback:</strong> @selectedFeedback.FeedbackText</p>
+                    <p><strong>Rating:</strong> @selectedFeedback.Rating</p>
+                    <p><strong>Status:</strong> @selectedFeedback.Status</p>
+                    <p><strong>Submitted On:</strong> @selectedFeedback.SubmittedOn.ToString("f")</p>
+                </div>
+                <div class="modal-footer">
+                    @if (selectedFeedback.Status == "New")
+                    {
+                        <button class="btn btn-success" @onclick="UpdateStatus">Mark as Reviewed</button>
+                    }
+                    <button class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code 
 {
     private List<FeedbackDTO>? feedbacks;
+    private FeedbackDTO? selectedFeedback;
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +87,38 @@
         {
             Console.WriteLine($"Error fetching feedbacks: {ex.Message}");
             feedbacks = new List<FeedbackDTO>();
+        }
+    }
+
+    private void ShowModal(FeedbackDTO fb)
+    {
+        selectedFeedback = fb;
+    }
+
+    private void CloseModal()
+    {
+        selectedFeedback = null;
+    }
+
+    private async Task UpdateStatus()
+    {
+        if (selectedFeedback == null) return;
+
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"api/feedback/{selectedFeedback.Id}/1",new{}); 
+            if (response.IsSuccessStatusCode)
+            {
+                selectedFeedback.Status = "Reviewed";
+            }
+            else
+            {
+                Console.WriteLine("Failed to update status.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating status: {ex.Message}");
         }
     }
 
