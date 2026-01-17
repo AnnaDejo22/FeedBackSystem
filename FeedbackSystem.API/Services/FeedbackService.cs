@@ -2,6 +2,7 @@ using FeedbackSystem.API.Data;
 using FeedbackSystem.API.Models;
 using FeedbackSystem.API.Services.Interfaces;
 using FeedbackSystem.Contracts.DTO;
+using FeedbackSystem.API.Enum;
 
 namespace FeedbackSystem.API.Services;
 
@@ -14,11 +15,55 @@ public class FeedbackService : IFeedbackService
         _context = context;
     }
 
-    public async Task<FeedbackDTO> SubmitFeedbackAsync(Feedback feedback)
+    public async Task<FeedbackDTO> SubmitFeedbackAsync(FeedbackDTO feedbackDto)
     {
-        feedback.SubmittedOn = DateTime.UtcNow;
+        // Map DTO → Entity
+        var feedbackEntity = new Feedback
+        {
+            UserName = feedbackDto.UserName,
+            Feedbacks = feedbackDto.FeedbackText,
+            Rating = feedbackDto.Rating,
+            Status = FeedBackStatus.New,
+            SubmittedOn = DateTime.UtcNow
+        };
 
-        _context.Feedbacks.Add(feedback);
+        _context.Feedbacks.Add(feedbackEntity);
+        await _context.SaveChangesAsync();
+
+        // Map Entity → DTO to return
+        return new FeedbackDTO
+        {
+            Id = feedbackEntity.Id,
+            UserName = feedbackEntity.UserName,
+            FeedbackText = feedbackEntity.Feedbacks,
+            Rating = feedbackEntity.Rating,
+            Status = feedbackEntity.Status.ToString(),
+            SubmittedOn = feedbackEntity.SubmittedOn
+        };
+    }
+
+    public async Task<List<FeedbackDTO>> GetAllFeedbacks()
+    {
+        var feedbackEntities =  _context.Feedbacks.ToList();
+
+        return feedbackEntities.Select(feedback => new FeedbackDTO
+        {
+            Id = feedback.Id,
+            UserName = feedback.UserName,
+            FeedbackText = feedback.Feedbacks,
+            Rating = feedback.Rating,
+            Status = feedback.Status.ToString(),
+            SubmittedOn = feedback.SubmittedOn
+        }).ToList();
+    }
+
+    public async Task<FeedbackDTO> UpdateFeedbackStatusAsync(int id, FeedBackStatus status)
+    {
+        var feedback = await _context.Feedbacks.FindAsync(id);
+        if (feedback == null)
+            throw new Exception("Feedback not found");
+
+        feedback.Status = status;
         await _context.SaveChangesAsync();
 
         return new FeedbackDTO
@@ -27,6 +72,7 @@ public class FeedbackService : IFeedbackService
             UserName = feedback.UserName,
             FeedbackText = feedback.Feedbacks,
             Rating = feedback.Rating,
+            Status = feedback.Status.ToString(),
             SubmittedOn = feedback.SubmittedOn
         };
     }

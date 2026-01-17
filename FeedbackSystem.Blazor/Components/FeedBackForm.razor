@@ -1,31 +1,76 @@
-@namespace FeedbackSystem.Blazor.Components
+@inject HttpClient Http
+@using System.ComponentModel.DataAnnotations
+@using FeedbackSystem.Contracts.DTO 
 
-<div class="feedback-container">
-  <div class="form-floating mb-3">
-    <input type="email" class="form-control" id="floatingInput" placeholder="Enter Your Username" >
-    <label for="floatingInput">User Name</label>
-  </div>
-  <div class="form-floating mb-3">
-    <textarea class="form-control" placeholder="Give Your Feedback" id="floatingTextarea" ></textarea>
-    <label for="floatingTextarea">FeedBack</label>
-  </div>
+<EditForm Model="feedback" OnValidSubmit="SubmitFeedback">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-  <div class="form-floating mb-3">
-    <label for="range4" class="form-label">Rating</label>
-    <input type="range" class="form-range" min="0" max="5" value="0" id="range4">
-    <output for="range4" id="rangeValue" aria-hidden="true"></output>
-  </div>
-  
-</div>
+    <div>
+        <label>Name:</label>
+        <InputText @bind-Value="feedback.UserName" />
+        <ValidationMessage For="@(() => feedback.UserName)" />
+    </div>
 
+    <div>
+        <label>Feedback:</label>
+        <InputTextArea @bind-Value="feedback.FeedbackText" />
+        <ValidationMessage For="@(() => feedback.FeedbackText)" />
+    </div>
 
-<script>
-  const rangeInput = document.getElementById('range4');
-  const rangeOutput = document.getElementById('rangeValue');
+    <div>
+        <label>Rating (1-5):</label>
+        <InputNumber @bind-Value="feedback.Rating" min="1" max="5" />
+        <ValidationMessage For="@(() => feedback.Rating)" />
+    </div>
 
-  rangeOutput.textContent = rangeInput.value;
+    <button type="submit">Submit</button>
+</EditForm>
 
-  rangeInput.addEventListener('input', function() {
-    rangeOutput.textContent = this.value;
-  });
-</script>
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    private FeedbackDTO feedback = new FeedbackDTO
+    {
+        UserName = string.Empty,
+        FeedbackText = string.Empty,
+        Rating = 1
+    };
+
+    private string message = string.Empty;
+
+    private async Task SubmitFeedback()
+    {
+        try
+        {
+            // POST to backend API
+            var response = await Http.PostAsJsonAsync("api/feedback", feedback);
+
+            if (response.IsSuccessStatusCode)
+            {
+                message = "Feedback submitted successfully!";
+
+                // Reset form
+                feedback = new FeedbackDTO
+                {
+                    UserName = string.Empty,
+                    FeedbackText = string.Empty,
+                    Rating = 1
+                };
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                message = $"Failed to submit feedback: {error}";
+            }
+        }
+        catch (Exception ex)
+        {
+            // Likely network/CORS error
+            message = $"Error submitting feedback: {ex.Message}";
+        }
+    }
+}

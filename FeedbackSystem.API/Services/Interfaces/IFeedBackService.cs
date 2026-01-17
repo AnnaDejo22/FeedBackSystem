@@ -1,9 +1,11 @@
-using FeedbackSystem.API.Models;
 using FeedbackSystem.Contracts.DTO;
+using FeedbackSystem.API.Enum;
 
 namespace FeedbackSystem.API.Services.Interfaces;
 
 public interface IFeedbackService
 {
-    Task<FeedbackDTO> SubmitFeedbackAsync(Feedback feedback);
+    Task<FeedbackDTO> SubmitFeedbackAsync(FeedbackDTO feedbackDto);
+    Task<List<FeedbackDTO>> GetAllFeedbacks();
+    Task<FeedbackDTO> UpdateFeedbackStatusAsync(int id, FeedBackStatus status);
 }
