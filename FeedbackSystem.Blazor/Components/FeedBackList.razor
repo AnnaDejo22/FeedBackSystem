@@ -14,6 +14,16 @@
     }
     else
     {
+        <li class="nav-item dropdown">
+            <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Dropdown
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="#">New Feedbacks</a></li>
+                <li><a class="dropdown-item" href="#">Reviewed Feedbacks</a></li>
+            </ul>
+        </li>
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -106,7 +116,7 @@
 
         try
         {
-            var response = await Http.PutAsJsonAsync($"api/feedback/{selectedFeedback.Id}/1",new{}); 
+            var response = await Http.PutAsJsonAsync($"api/feedback/{selectedFeedback.Id}/1", new {}); 
             if (response.IsSuccessStatusCode)
             {
                 selectedFeedback.Status = "Reviewed";
