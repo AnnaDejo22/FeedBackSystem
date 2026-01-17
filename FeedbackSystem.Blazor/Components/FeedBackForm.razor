@@ -1,0 +1,31 @@
+@namespace FeedbackSystem.Blazor.Components
+
+<div class="feedback-container">
+  <div class="form-floating mb-3">
+    <input type="email" class="form-control" id="floatingInput" placeholder="Enter Your Username" >
+    <label for="floatingInput">User Name</label>
+  </div>
+  <div class="form-floating mb-3">
+    <textarea class="form-control" placeholder="Give Your Feedback" id="floatingTextarea" ></textarea>
+    <label for="floatingTextarea">FeedBack</label>
+  </div>
+
+  <div class="form-floating mb-3">
+    <label for="range4" class="form-label">Rating</label>
+    <input type="range" class="form-range" min="0" max="5" value="0" id="range4">
+    <output for="range4" id="rangeValue" aria-hidden="true"></output>
+  </div>
+  
+</div>
+
+
+<script>
+  const rangeInput = document.getElementById('range4');
+  const rangeOutput = document.getElementById('rangeValue');
+
+  rangeOutput.textContent = rangeInput.value;
+
+  rangeInput.addEventListener('input', function() {
+    rangeOutput.textContent = this.value;
+  });
+</script>
