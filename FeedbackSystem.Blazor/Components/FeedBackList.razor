@@ -14,48 +14,50 @@
     }
     else
     {
-        <div class="mb-3">
-            <button class="btn btn-secondary me-2" @onclick="LoadAll">
-                All Feedbacks
-            </button>
+        <div class="main-container">
+            <div class="mb-3">
+                <button class="btn btn-secondary me-2" @onclick="LoadAll">
+                    All Feedbacks
+                </button>
 
-            <button class="btn btn-primary me-2" @onclick="LoadNew">
-                New Feedbacks
-            </button>
+                <button class="btn btn-primary me-2" @onclick="LoadNew">
+                    New Feedbacks
+                </button>
 
-            <button class="btn btn-success" @onclick="LoadReviewed">
-                Reviewed Feedbacks
-            </button>
-        </div>
+                <button class="btn btn-success" @onclick="LoadReviewed">
+                    Reviewed Feedbacks
+                </button>
+            </div>
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>User Name</th>
-                    <th>Feedback</th>
-                    <th>Rating</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach (var fb in filteredFeedbacks)
-                {
+            <table class="table table-striped">
+                <thead>
                     <tr>
-                        <td>@fb.UserName</td>
-                        <td>@fb.FeedbackText</td>
-                        <td>@fb.Rating</td>
-                        <td>@fb.Status</td>
-                        <td>
-                            <button class="btn btn-primary btn-sm" @onclick="() => ShowModal(fb)">
-                                View
-                            </button>
-                        </td>
+                        <th>User Name</th>
+                        <th>Feedback</th>
+                        <th>Rating</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    @foreach (var fb in filteredFeedbacks)
+                    {
+                        <tr>
+                            <td>@fb.UserName</td>
+                            <td>@fb.FeedbackText</td>
+                            <td>@fb.Rating</td>
+                            <td>@fb.Status</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" @onclick="() => ShowModal(fb)">
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>    
     }
 </div>
 

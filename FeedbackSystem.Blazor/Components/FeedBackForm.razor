@@ -14,8 +14,7 @@
 
     <div class="mb-3">
         <label class="form-label">Feedback</label>
-        <InputTextArea class="form-control" rows="3"
-                       @bind-Value="feedback.FeedbackText" />
+        <InputTextArea class="form-control" rows="3" @bind-Value="feedback.FeedbackText" />
         <ValidationMessage For="@(() => feedback.FeedbackText)" />
     </div>
 
@@ -37,8 +36,7 @@
 
 @if (askConfirmation)
 {
-    <div class="modal fade show d-block"
-         style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal fade show d-block" >
         <div class="modal-dialog">
             <div class="modal-content">
 
@@ -82,7 +80,7 @@
     {
         UserName = string.Empty,
         FeedbackText = string.Empty,
-        Rating = 1
+        Rating = 0
     };
 
     private void ShowModal()
