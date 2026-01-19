@@ -17,20 +17,18 @@ public class FeedbackService : IFeedbackService
 
     public async Task<FeedbackDTO> SubmitFeedbackAsync(FeedbackDTO feedbackDto)
     {
-        // Map DTO → Entity
         var feedbackEntity = new Feedback
         {
             UserName = feedbackDto.UserName,
             Feedbacks = feedbackDto.FeedbackText,
             Rating = feedbackDto.Rating,
             Status = FeedBackStatus.New,
-            SubmittedOn = DateTime.UtcNow
+            SubmittedOn = DateTime.Now
         };
 
         _context.Feedbacks.Add(feedbackEntity);
         await _context.SaveChangesAsync();
 
-        // Map Entity → DTO to return
         return new FeedbackDTO
         {
             Id = feedbackEntity.Id,
@@ -75,5 +73,16 @@ public class FeedbackService : IFeedbackService
             Status = feedback.Status.ToString(),
             SubmittedOn = feedback.SubmittedOn
         };
+    }
+
+    public async Task<bool> DeleteFeedbackAsync(int id)
+    {
+        var feedback = await _context.Feedbacks.FindAsync(id);
+        if (feedback == null)
+            return false;
+        _context.Feedbacks.Remove(feedback);
+        await _context.SaveChangesAsync();
+
+        return true;
     }
 }

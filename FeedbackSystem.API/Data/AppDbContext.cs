@@ -40,8 +40,7 @@ public class AppDbContext : DbContext
                   .HasDefaultValue(FeedBackStatus.New);
 
             entity.Property(f => f.SubmittedOn)
-                  .IsRequired()
-                  .HasDefaultValueSql("GETUTCDATE()");
+                  .IsRequired();
         });
     }
 }

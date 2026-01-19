@@ -37,7 +37,6 @@
 
 @if (askConfirmation)
 {
-    <!-- Confirmation Modal -->
     <div class="modal fade show d-block"
          style="background-color: rgba(0,0,0,0.5);">
         <div class="modal-dialog">
@@ -111,7 +110,7 @@
                 return;
             }
 
-            message = "✅ Feedback submitted successfully!";
+            message = "Feedback submitted successfully!";
 
             feedback = new FeedbackDTO
             {
@@ -122,11 +121,11 @@
         }
         catch (HttpRequestException ex)
         {
-            message = $"❌ Network error: {ex.Message}";
+            message = $"Network error: {ex.Message}";
         }
         catch (Exception ex)
         {
-            message = $"❌ Unexpected error: {ex.Message}";
+            message = $"Unexpected error: {ex.Message}";
         }
         finally
         {

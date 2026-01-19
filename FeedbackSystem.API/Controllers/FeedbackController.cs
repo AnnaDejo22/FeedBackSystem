@@ -64,20 +64,27 @@ public class FeedbackController : ControllerBase
     [HttpPut("{id:int}/{status:int}")]
     public async Task<IActionResult> UpdateFeedbackStatus(int id, int status)
     {
-        // Validate status value
         if (status != 0 && status != 1)
             return BadRequest("Invalid status value. Allowed values: 0 = New, 1 = Reviewed.");
 
-        // Map int to enum
         var enumStatus = (FeedBackStatus)status;
 
-        // Call service
         var updatedFeedback = await _feedbackService.UpdateFeedbackStatusAsync(id, enumStatus);
 
         if (updatedFeedback == null)
             return NotFound($"Feedback with ID {id} not found.");
 
         return Ok(updatedFeedback);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteFeedback(int id)
+    {
+        Console.WriteLine($"Received request to delete feedback with ID: {id}");
+        var isDeleted = await _feedbackService.DeleteFeedbackAsync(id);
+
+        if (isDeleted) return Ok("Feedback deleted successfully.");
+        else return NotFound("Feedback deletion failed.");
     }
 
 }
