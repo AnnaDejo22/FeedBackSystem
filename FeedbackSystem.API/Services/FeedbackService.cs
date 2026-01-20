@@ -24,6 +24,7 @@ public class FeedbackService : IFeedbackService
             Feedbacks = feedbackDto.FeedbackText,
             Rating = feedbackDto.Rating,
             Status = FeedBackStatus.New,
+            FeedbackCategory=feedbackDto.FeedbackCategory,
             SubmittedOn = DateTime.Now
         };
 
@@ -37,6 +38,7 @@ public class FeedbackService : IFeedbackService
             FeedbackText = feedbackEntity.Feedbacks,
             Rating = feedbackEntity.Rating,
             Status = feedbackEntity.Status.ToString(),
+            FeedbackCategory=feedbackEntity.FeedbackCategory,
             SubmittedOn = feedbackEntity.SubmittedOn
         };
     }

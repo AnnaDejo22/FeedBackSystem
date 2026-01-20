@@ -20,6 +20,8 @@ public class Feedback
     [Required]
     public FeedBackStatus Status { get; set; } = FeedBackStatus.New;
 
+    public string? FeedbackCategory{get;set;}
+
     [Required]
     public DateTime SubmittedOn { get; set; } = DateTime.UtcNow;
 }

@@ -15,17 +15,15 @@
     else
     {
         <div class="main-container">
+
             <div class="mb-3">
-                <button class="btn btn-secondary me-2" @onclick="LoadAll">
-                    All Feedbacks
+                <button class="btn btn-secondary me-2" @onclick="LoadAll">All Feedbacks
                 </button>
 
-                <button class="btn btn-primary me-2" @onclick="LoadNew">
-                    New Feedbacks
+                <button class="btn btn-primary me-2" @onclick="LoadNew">New Feedbacks
                 </button>
 
-                <button class="btn btn-success" @onclick="LoadReviewed">
-                    Reviewed Feedbacks
+                <button class="btn btn-success" @onclick="LoadReviewed">Reviewed Feedbacks
                 </button>
             </div>
 
@@ -35,37 +33,52 @@
                         <th>User Name</th>
                         <th>Feedback</th>
                         <th>Rating</th>
+                        <th>Submitted On</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @foreach (var fb in filteredFeedbacks)
+                    @if (pagedFeedbacks != null)
                     {
-                        <tr>
-                            <td>@fb.UserName</td>
-                            <td>@fb.FeedbackText</td>
-                            <td>@fb.Rating</td>
-                            <td>@fb.Status</td>
-                            <td>
-                                <button class="btn btn-primary btn-sm" @onclick="() => ShowModal(fb)">
-                                    View
-                                </button>
-                            </td>
-                        </tr>
+                        @foreach (var fb in pagedFeedbacks)
+                        {
+                            <tr>
+                                <td>@fb.UserName</td>
+                                <td>@fb.FeedbackText</td>
+                                <td>@fb.Rating</td>
+                                <td>@fb.SubmittedOn.ToString("f")</td>
+                                <td>@fb.Status</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" @onclick="() => ShowModal(fb)"> View
+                                    </button>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
-        </div>    
+
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(size == 0 ? "disabled" : "")">
+                        <a class="page-link" href="#" @onclick="BackwardPaging">Previous</a>
+                    </li>
+
+                    <li class="page-item @((size + PageSize) >= filteredFeedbacks.Count ? "disabled" : "")">
+                        <a class="page-link" href="#" @onclick="ForwardPaging"> Next </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
     }
 </div>
 
 @if (selectedFeedback != null)
 {
-    <div class="modal fade show d-block"
-         tabindex="-1"
-         style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal fade show d-block"  tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
 
         <div class="modal-dialog">
             <div class="modal-content">
@@ -81,8 +94,7 @@
                     <p><strong>Rating:</strong> @selectedFeedback.Rating</p>
                     <p><strong>Status:</strong> @selectedFeedback.Status</p>
                     <p>
-                        <strong>Submitted On:</strong>
-                        @selectedFeedback.SubmittedOn.ToString("f")
+                        <strong>Submitted On:</strong> @selectedFeedback.SubmittedOn.ToString("f")
                     </p>
                 </div>
 
@@ -108,37 +120,68 @@
     </div>
 }
 
-@code 
+@code
 {
     private List<FeedbackDTO>? filteredFeedbacks;
+    private List<FeedbackDTO>? pagedFeedbacks;
     private FeedbackDTO? selectedFeedback;
 
+    private int size = 0;
+    private const int PageSize = 10;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadAll();
     }
 
-
     private async Task LoadAll()
     {
         var response = await Http.GetFromJsonAsync<ApiResponse>("api/feedback");
-
         filteredFeedbacks = response?.Data ?? new List<FeedbackDTO>();
+        size = 0;
+        ApplyPaging();
     }
 
     private async Task LoadNew()
     {
         var response = await Http.GetFromJsonAsync<ApiResponse>("api/feedback/0");
-
         filteredFeedbacks = response?.Data ?? new List<FeedbackDTO>();
+        size = 0;
+        ApplyPaging();
     }
 
     private async Task LoadReviewed()
     {
         var response = await Http.GetFromJsonAsync<ApiResponse>("api/feedback/1");
-
         filteredFeedbacks = response?.Data ?? new List<FeedbackDTO>();
+        size = 0;
+        ApplyPaging();
+    }
+
+    private void ApplyPaging()
+    {
+        if (filteredFeedbacks == null) return;
+
+        pagedFeedbacks = filteredFeedbacks .Skip(size) .Take(PageSize).ToList();
+    }
+
+    private Task ForwardPaging()
+    {
+        size += PageSize;
+        ApplyPaging();
+
+        return Task.CompletedTask;
+    }
+
+    private Task BackwardPaging()
+    {
+
+        size -= PageSize;
+        if (size < 0) size = 0;
+
+        ApplyPaging();
+
+        return Task.CompletedTask;
     }
 
     private void ShowModal(FeedbackDTO fb)
@@ -155,7 +198,8 @@
     {
         if (selectedFeedback == null) return;
 
-        var response = await Http.PutAsJsonAsync($"api/feedback/{selectedFeedback.Id}/1",new { } );
+        var response =
+            await Http.PutAsJsonAsync($"api/feedback/{selectedFeedback.Id}/1", new { });
 
         if (response.IsSuccessStatusCode)
         {
@@ -167,15 +211,16 @@
     {
         if (selectedFeedback == null) return;
 
-        var response =await Http.DeleteAsync($"api/feedback/{selectedFeedback.Id}");
+        var response =
+            await Http.DeleteAsync($"api/feedback/{selectedFeedback.Id}");
 
         if (response.IsSuccessStatusCode)
         {
             filteredFeedbacks?.Remove(selectedFeedback);
+            ApplyPaging();
             CloseModal();
         }
     }
-
 
     private class ApiResponse
     {
