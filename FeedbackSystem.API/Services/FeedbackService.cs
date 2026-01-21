@@ -4,6 +4,8 @@ using FeedbackSystem.API.Services.Interfaces;
 using FeedbackSystem.Contracts.DTO;
 using FeedbackSystem.API.Enum;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace FeedbackSystem.API.Services;
 
@@ -108,4 +110,27 @@ public class FeedbackService : IFeedbackService
         }).ToList();
         return feedbackDtos;
     }
+
+    public async Task<List<FeedbackDTO>> SearchFeedbackAsync(string word)
+    {
+        var feedback = await _context.Feedbacks
+            .Where(fb =>
+                fb.UserName.Contains(word) ||
+                fb.Feedbacks.Contains(word))
+            .ToListAsync();
+
+        var feedbackDtos = feedback.Select(feedback => new FeedbackDTO
+        {
+            Id = feedback.Id,
+            UserName = feedback.UserName,
+            FeedbackText = feedback.Feedbacks,
+            Rating = feedback.Rating,
+            Status = feedback.Status.ToString(),
+            SubmittedOn = feedback.SubmittedOn
+        }).ToList();
+
+
+        return feedbackDtos;
+    }
+
 }

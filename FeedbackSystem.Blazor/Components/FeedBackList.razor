@@ -29,9 +29,10 @@
 
             <div>
                 <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+                    <InputText class="form-control me-2"  type="search"  placeholder="Search"  aria-label="Search"  @bind-Value="word"/>
+                    <button class="btn btn-outline-success"  type="button"  @onclick="() => SearchWord(word)"> Search  </button>
                 </form>
+
             </div>
     
             
@@ -137,6 +138,7 @@
 
     private int size = 0;
     private const int PageSize = 10;
+    String word="";
 
     protected override async Task OnInitializedAsync()
     {
@@ -154,22 +156,6 @@
         size = 0;
         ApplyPaging();
     }
-
-    @* private async Task LoadNew()
-    {
-        var response = await Http.GetFromJsonAsync<ApiResponse>("api/feedback/0");
-        filteredFeedbacks = response?.Data ?? new List<FeedbackDTO>();
-        size = 0;
-        ApplyPaging();
-    }
-
-    private async Task LoadReviewed()
-    {
-        var response = await Http.GetFromJsonAsync<ApiResponse>("api/feedback/1");
-        filteredFeedbacks = response?.Data ?? new List<FeedbackDTO>();
-        size = 0;
-        ApplyPaging();
-    } *@
 
     private void ApplyPaging()
     {
@@ -233,6 +219,15 @@
             ApplyPaging();
             CloseModal();
         }
+    }
+
+    private async Task SearchWord(String searchword)
+    {
+        ApiResponse response;
+        response = await Http.GetFromJsonAsync<ApiResponse>($"api/feedback/search/{searchword}");
+        filteredFeedbacks = response?.Data ?? new List<FeedbackDTO>();
+        size = 0;
+        ApplyPaging();
     }
 
     private class ApiResponse

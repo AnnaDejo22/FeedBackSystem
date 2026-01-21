@@ -39,8 +39,8 @@ public class FeedbackController : ControllerBase
         }
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetFeedbacks([FromBody]int? status=null)
+    [HttpGet("{status:int?}")]
+    public async Task<IActionResult> GetFeedbacks(int? status=null)
     {
         try
         {
@@ -87,24 +87,37 @@ public class FeedbackController : ControllerBase
         else return NotFound("Feedback deletion failed.");
     }
 
-    [HttpGet("{status}")]
-    public async Task<IActionResult> SortFeedbacks(FeedBackStatus status)
+    [HttpGet("search/{word}")]
+    public async Task<IActionResult> SearchFeedback(string word)
     {
-        var feedbacks = await _feedbackService.SortFeedbacksByStatusAsync(status);
-
-        if (!feedbacks.Any())
+        try
         {
-            return NotFound(new
+            if (string.IsNullOrWhiteSpace(word))
             {
-                message = "No feedbacks found for the given status."
+                return BadRequest(new { message = "Search term cannot be empty." });
+            }
+
+            var feedback = await _feedbackService.SearchFeedbackAsync(word);
+
+            if (feedback == null || !feedback.Any())
+            {
+                return NotFound(new { message = "No feedback found matching the search term." });
+            }
+
+            return Ok(new
+            {
+                message = "Feedback search results retrieved successfully",
+                data = feedback
             });
         }
-
-        return Ok(new
+        catch (Exception ex)
         {
-            message = "Feedbacks fetched successfully",
-            data = feedbacks
-        });
+            return StatusCode(500, new
+            {
+                message = "An error occurred while searching feedback",
+                error = ex.Message
+            });
+        }
     }
 
 }

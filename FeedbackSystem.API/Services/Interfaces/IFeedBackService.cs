@@ -10,4 +10,5 @@ public interface IFeedbackService
     Task<FeedbackDTO> UpdateFeedbackStatusAsync(int id, FeedBackStatus status);
     Task<bool> DeleteFeedbackAsync(int id);
     Task<List<FeedbackDTO>> SortFeedbacksByStatusAsync(FeedBackStatus status);
+    Task<List<FeedbackDTO>> SearchFeedbackAsync(string word);
 }
